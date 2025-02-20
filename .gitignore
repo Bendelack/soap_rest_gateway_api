@@ -1,0 +1,5 @@
+env/
+instance/
+migrations/
+notas.txt
+__pycache__
