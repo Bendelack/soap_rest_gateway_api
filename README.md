@@ -14,6 +14,3 @@
 >- Demonstre o arquivo WSDL gerado apresentando suas principais tags
 >- Desenvolver cliente(s) em linguagem(ns) diferente(s) do servidor detalhando a arquitetura utilizada e como o cliente utiliza o WSDL para montar suas requisições
 >- Utilizar um MOM (WebsphereMQ, RabbitMQ, OpenMQ) e interligar os processos
-
-## O Projeto - 
-- 
