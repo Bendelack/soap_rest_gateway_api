@@ -49,7 +49,7 @@ app.get("/ranking", authenticateToken, (req, res) => {
 
 // enviar username para o SOAP
 app.post("/tentativa", authenticateToken, async (req, res) => {
-    const { palavra } = req.body;    
+    const { palavra, acertou } = req.body;    
     const username = req.user.username;
 
     try {
@@ -73,6 +73,7 @@ app.post("/tentativa", authenticateToken, async (req, res) => {
                 <soap:mensagem>
                     <arg0>${username}</arg0>
                     <arg1>${palavra}</arg1>
+                    <arg2>${acertou}</arg2>
                 </soap:mensagem>
             </soapenv:Body>
         </soapenv:Envelope>
@@ -83,7 +84,6 @@ app.post("/tentativa", authenticateToken, async (req, res) => {
                 'Content-Type': 'text/xml',
             }
         })
-        console.log("Tentativa enviada com sucesso!");
         
     } catch (err) {
         console.log(err);
@@ -129,7 +129,6 @@ app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = (await axios.get(`${API_REST+username}`)).data; // get use by username from rest api
-        console.log(user);
         
         if(!user || password != user.password)
             // res.redirect("/error");

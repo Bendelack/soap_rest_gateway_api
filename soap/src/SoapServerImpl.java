@@ -25,8 +25,12 @@ public class SoapServerImpl implements SoapServer {
         this.canal.queueDeclare(nome_fila, true, false, false, null);
     }
     @Override
-    public void mensagem(String username, String palavra) throws Exception {
-        String msg = String.format("%s acertou a palavra %s", username, palavra);
+    public void mensagem(String username, String palavra, Boolean acertou) throws Exception {
+        String msg;
+        if(acertou)
+            msg = String.format("%s acertou a palavra %s", username, palavra);
+        else
+            msg = String.format("%s tentou a palavra %s e errou", username, palavra);
 
         this.canal.basicPublish("", nome_fila, null, msg.getBytes());
         System.out.println("Evento publicado: " + msg);

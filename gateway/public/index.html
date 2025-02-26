@@ -25,7 +25,35 @@
         <input required type="text" placeholder="Sua tentantiva aqui..." id="palavra" name="palavra" class="p-2 text-[22px] focus:outline-none">
         <button class="rounded-md text-white p-2 cursor-pointer bg-purple-900 text-[22px] hover:opacity-80">Enviar</button>
     </form>
-    <div id="eventos"></div>
+    <!-- <div class=" max-h-[300px] overflow-y-auto border border-gray-300 rounded-md p-4">
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
+    </div> -->
+    <div id="eventos" class="max-h-[300px] overflow-y-auto border-purple-300 border p-4">
+        <p class="text-center text-[#D3AD69] text-[22px] border-b-2 border-[#D3AD69] inline-block mb-[px] py-1 px-2">Eventos do jogo</p>
+    </div>
 </body>
 <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 <script>
@@ -52,11 +80,20 @@
     }
 
     socket.on("evento", (mensagem) => {
-        console.log("mensagem recebida!");
         const eventosDiv = document.getElementById("eventos");
         const evento = document.createElement("p");
+        if(mensagem.includes("acertou"))
+            evento.className = "text-[#3AA394] my-2"
+        else
+            evento.className = "text-[#E61E48] my-2"
+
         evento.innerText = mensagem;
         eventosDiv.appendChild(evento);
+    })
+
+    // alimenta a variável quando o socket mandar uma nova palavra
+    socket.on("palavra", (palavra) => {
+        palavraSortada = palavra;
     })
 
 
@@ -76,14 +113,15 @@
     });
 
     function conferirPalavra(palavra){
-        console.log(palavra);
         let cores = ["#312A2C", "#312A2C", "#312A2C", "#312A2C", "#312A2C"]; // cor de letra inexistente na palavra
 
         if(palavraSortada == palavra){
             cores = ["#3AA394", "#3AA394", "#3AA394", "#3AA394", "#3AA394"]; // cor de letra certa em todos os blocos
-            sortear(); // chama função para sortear nova palavra
-            registrarAcerto(palavra); // função para registrar o acerto
+            socket.emit("acerto", palavra);
+            registrarTentativa(palavra, true); // função para registrar o acerto
+            // sortear(); // chama função para sortear nova palavra
         } else {
+            registrarTentativa(palavra, false); // função para registrar o acerto
             for (let i = 0; i < 5; i++) {
                 if(palavra[i] == palavraSortada[i]) // acertou a letra e a posição
                     cores[i] = "#3AA394"; // cor verde na possição da letra certa
@@ -125,14 +163,16 @@
     }
 
     // função para registrar o acerto do usuário
-    async function registrarAcerto(palavra){
+    async function registrarTentativa(palavra, acertou){
+        console.log(palavra);
+        
         try {
             const resposta = await fetch("/tentativa", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ palavra })
+                body: JSON.stringify({ palavra, acertou })
             });
 
             if (resposta.ok) {
@@ -144,7 +184,7 @@
         console.log("ocorreu um erro: ", err);
         }
     }
-    sortear();
+    // sortear();
 
 </script>
 </html>
