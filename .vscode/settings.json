@@ -1,0 +1,10 @@
+{
+    "java.project.sourcePaths": [
+        "."
+    ],
+    "java.project.referencedLibraries": [
+        "soap\\lib\\amqp-client-5.9.0.jar",
+        "soap\\lib\\jakarta.jws-api.jar",
+        "soap\\lib\\jakarta.xml.ws-api-4.0.0.jar"
+    ]
+}

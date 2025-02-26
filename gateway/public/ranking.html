@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-5 bg-purple-200 text-center">
+    <a href="/"><img class="mx-auto" src="/images/logomarca.svg" alt="logomarca" width="500px"/></a>
+    <div class="mx-auto w-[500px] grid grid-cols-[2fr_2fr_1fr]">
+        <a href="/" class="hover:bg-purple-700 text-[#3aa394] hover:text-white font-semibold cursor-pointer font-[19px] mt-5">Jogar</a>
+        <a href="/ranking" class="text-white font-semibold bg-purple-700 cursor-pointer font-[19px] mt-5">Raking</a>
+        <a href="/logout" class="text-[#e61e48] font-semibold hover:underline cursor-pointer font-[19px] mt-5">Sair</a>
+    </div>
+    <div id="rank" class="w-[500px] mx-auto my-5 border-2 rounded-sm border-purple-500">
+        <div class="grid grid-cols-[1fr_1fr_1fr] text-[22px] text-[#312A2C] ">
+            <span>Posição</span>
+            <span>Username</span>
+            <span>Pontuação</span>
+        </div>
+    </div>
+</body>
+<script>
+    const rank = document.getElementById("rank");
+    async function fetchUsers() {
+        try {
+            const response = await fetch("http://192.168.0.16:8080/users/");
+            const users = await response.json(); // Converte a resposta para JSON
+            users.sort((a, b) => b.score - a.score);
+            console.log(users);
+            
+            // const users = data.data; // Acessa a propriedade 'data' que contém os usuários
+            users.map((user, index) => {
+                const userDiv = document.createElement("div");
+                userDiv.className = "border-t-2 border-purple-300 grid grid-cols-[1fr_1fr_1fr] text-[22px] text-purple-900";
+                userDiv.innerHTML = `
+                    <p class="text-[#635C62]">${index+1}º</p>
+                    <p class="text-[#D3AD69]">${user.username}</p>
+                    <p class="border-l-2 text-[#3AA394]">${user.score} pts</p>
+                `;
+                rank.appendChild(userDiv);
+            });
+        } catch (error) {
+            console.error("Erro ao buscar usuários:", error);
+            const rank = document.getElementById("users-container");
+            rank.innerHTML = "<p>Erro ao carregar usuários.</p>";
+        }
+    }
+    fetchUsers();
+</script>
+</html>

@@ -3,3 +3,6 @@ instance/
 migrations/
 notas.txt
 __pycache__
+bin/
+node_modules/
+package-lock.json

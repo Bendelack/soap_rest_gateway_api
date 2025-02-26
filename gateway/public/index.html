@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-5 bg-purple-200 text-center">
+    <a href="/"><img class="mx-auto" src="/images/logomarca.svg" alt="logomarca" width="500px"/></a>
+    <div class="mx-auto w-[500px] grid grid-cols-[2fr_2fr_1fr]">
+        <a href="/" class="text-white bg-purple-700 font-semibold font-[19px] mt-5">Jogar</a>
+        <a href="/ranking" class="text-[#3aa394] hover:text-white hover:bg-purple-700 font-semibold cursor-pointer font-[19px] mt-5">Ranking</a>
+        <a href="/logout" class="text-[#e61e48] font-semibold hover:underline cursor-pointer font-[19px] mt-5">Sair</a>
+    </div>
+    <p class="p-5 text-[35px]">Olá, seja bem-vindo(a) ao game baseado no wordle/termo!</p>
+    <div class="flex items-center justify-center w-[500px] mx-auto bg-[#6E5C62] py-2">
+        <div id="a" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#3AA394] mx-1 text-[35px] text-white font-black text-center">H</div>
+        <div id="b" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#312A2C] mx-1 text-[35px] text-white font-black text-center">E</div>
+        <div id="c" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#D3AD69] mx-1 text-[35px] text-white font-black text-center">L</div>
+        <div id="d" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#312A2C] mx-1 text-[35px] text-white font-black text-center">L</div>
+        <div id="e" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#3AA394] mx-1 text-[35px] text-white font-black text-center">O</div>
+    </div>
+    <form id="form" class="flex items-center justify-around w-[500px] mx-auto p-5 my-10" method="post" action="/tentativa">
+        <input required type="text" placeholder="Sua tentantiva aqui..." id="palavra" name="palavra" class="p-2 text-[22px] focus:outline-none">
+        <button class="rounded-md text-white p-2 cursor-pointer bg-purple-900 text-[22px] hover:opacity-80">Enviar</button>
+    </form>
+    <div id="eventos"></div>
+</body>
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+<script>
+    const socket = io("ws://192.168.0.16:3001");
+    const palavras = [
+        "AREIA", "ARENA", "AUDIO", "AUREO", "BAILE", "BARCO", "BARRA", "BOLSA", "BORDA", // [A-B]
+        "CLONE", "DRAMA", "FRETE", "GRAMA", "GRATO", "HOMEM", "IDEAL", "ITENS", "JEGUE", // [C-J]
+        "MANGA", "MANTO", "MEIAS", "MOLHO", "NATAL", "NOITE", "PADRE", "PEDRA", "PODER", // [M-P]
+        "PONTE", "POSTE", "SOBRE", "SAMBA", "TEMPO", "TERMO", "TRENA", "VASCO", "ZEBRA"  // [P-Z]
+    ];
+    let max;
+    let indexSorteado;
+    let palavraSortada;
+    const a = document.getElementById("a"); // bloco de letra
+    const b = document.getElementById("b"); // bloco de letra
+    const c = document.getElementById("c"); // bloco de letra
+    const d = document.getElementById("d"); // bloco de letra
+    const e = document.getElementById("e"); // bloco de letra
+
+    function sortear(){
+        max = palavras.length;
+        indexSorteado = Math.floor(Math.random()*max);
+        palavraSortada = palavras[indexSorteado];
+    }
+
+    socket.on("evento", (mensagem) => {
+        console.log("mensagem recebida!");
+        const eventosDiv = document.getElementById("eventos");
+        const evento = document.createElement("p");
+        evento.innerText = mensagem;
+        eventosDiv.appendChild(evento);
+    })
+
+
+    document.getElementById("form").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        // palavra digitada pelo usuário
+        const input = document.getElementById("palavra");
+        const palavra = input.value.toUpperCase();
+
+        if(palavra.length !== 5)
+            alert("A palavra precisa conter exatamente CINCO caracteres!");
+        else{
+            conferirPalavra(palavra);
+            input.value = '';
+        }
+    });
+
+    function conferirPalavra(palavra){
+        console.log(palavra);
+        let cores = ["#312A2C", "#312A2C", "#312A2C", "#312A2C", "#312A2C"]; // cor de letra inexistente na palavra
+
+        if(palavraSortada == palavra){
+            cores = ["#3AA394", "#3AA394", "#3AA394", "#3AA394", "#3AA394"]; // cor de letra certa em todos os blocos
+            sortear(); // chama função para sortear nova palavra
+            registrarAcerto(palavra); // função para registrar o acerto
+        } else {
+            for (let i = 0; i < 5; i++) {
+                if(palavra[i] == palavraSortada[i]) // acertou a letra e a posição
+                    cores[i] = "#3AA394"; // cor verde na possição da letra certa
+                else if(palavraSortada.includes(palavra[i])){ // acertou a letra mas errou a posição
+                    const letrasAnteriores = palavraSortada.slice(0, i); // pega as letras anteriores
+                    // contagem da letra até certo ponto
+                    const correspondeciasLetrasAnteriores = contarLetra(letrasAnteriores, palavra[i]);
+                    // conta da letra da palavra completa
+                    const correspondeciasPalavraSorteada = contarLetra(palavraSortada, palavra[i]);
+                    // se a correspondecia da letra na palavra for maior que até certo ponto
+                    if(correspondeciasPalavraSorteada > correspondeciasLetrasAnteriores)
+                        cores[i] = "#D3AD69"; // cor dourada indica a posição errada daletra
+                }
+            }
+        }
+
+        // aplicando as cores do array nos blocos
+        a.style.backgroundColor = cores[0];
+        a.innerHTML = palavra[0];
+        b.style.backgroundColor = cores[1];
+        b.innerHTML = palavra[1];
+        c.style.backgroundColor = cores[2];
+        c.innerHTML = palavra[2];
+        d.style.backgroundColor = cores[3];
+        d.innerHTML = palavra[3];
+        e.style.backgroundColor = cores[4];
+        e.innerHTML = palavra[4];
+    }
+
+    // função para contar a quantidade de vezes que uma letra aparece em uma palavra
+    function contarLetra(palavra, letra) {
+        let contador = 0;
+        for (let i = 0; i < palavra.length; i++) {
+            if (palavra[i].toLowerCase() === letra.toLowerCase()) { // Ignora maiúsculas/minúsculas
+            contador++;
+            }
+        }
+        return contador;
+    }
+
+    // função para registrar o acerto do usuário
+    async function registrarAcerto(palavra){
+        try {
+            const resposta = await fetch("/tentativa", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ palavra })
+            });
+
+            if (resposta.ok) {
+                console.log("Tentativa enviada!");
+            } else {
+                console.log("Erro ao enviar tentativa.");
+            }
+        } catch(err){
+        console.log("ocorreu um erro: ", err);
+        }
+    }
+    sortear();
+
+</script>
+</html>
