@@ -9,5 +9,5 @@ import jakarta.jws.soap.SOAPBinding.Style;;
 @WebService
 @SOAPBinding(style = Style.RPC)
 public interface SoapServer {
-    @WebMethod  public void mensagem(String username, String palavra) throws Exception;
+    @WebMethod  public void mensagem(String username, String palavra, Boolean acertou) throws Exception;
 }

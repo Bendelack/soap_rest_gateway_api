@@ -49,22 +49,25 @@ app.get("/ranking", authenticateToken, (req, res) => {
 
 // enviar username para o SOAP
 app.post("/tentativa", authenticateToken, async (req, res) => {
-    const { palavra } = req.body;    
+    const { palavra, acertou } = req.body;    
     const username = req.user.username;
+    console.log(" > " + palavra + " ");
 
     try {
         // aumentando o score do usuário
-        const user = (await axios.get(`${API_REST+username}`)).data; // get use by username from rest api
-        const score = parseInt(user.score) + 1;
-        const userToPatch = {
-            score: score
-        }
-
-        await axios.patch(`${API_REST}${user.id}`, userToPatch, {
-            headers: {
-                "Content-Type": "application/json"
+        if(acertou){
+            const user = (await axios.get(`${API_REST+username}`)).data; // get use by username from rest api
+            const score = parseInt(user.score) + 1;
+            const userToPatch = {
+                score: score
             }
-        }); // get use by username from rest api
+
+            await axios.patch(`${API_REST}${user.id}`, userToPatch, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }); // get use by username from rest api
+        }
 
         const xmlData = `
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://src.soap/">
@@ -73,6 +76,7 @@ app.post("/tentativa", authenticateToken, async (req, res) => {
                 <soap:mensagem>
                     <arg0>${username}</arg0>
                     <arg1>${palavra}</arg1>
+                    <arg2>${acertou}</arg2>
                 </soap:mensagem>
             </soapenv:Body>
         </soapenv:Envelope>
@@ -83,7 +87,8 @@ app.post("/tentativa", authenticateToken, async (req, res) => {
                 'Content-Type': 'text/xml',
             }
         })
-        console.log("Tentativa enviada com sucesso!");
+
+        res.json({ mensagem: "Tentativa registrada!" });
         
     } catch (err) {
         console.log(err);
@@ -129,7 +134,6 @@ app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = (await axios.get(`${API_REST+username}`)).data; // get use by username from rest api
-        console.log(user);
         
         if(!user || password != user.password)
             // res.redirect("/error");
