@@ -1,9 +1,9 @@
-# Gateway e MOM
+# Socket
 # Tecnologia: Node.js
 # Comandos
 ## Entre no diretório
 ```sh
-cd ./gateway
+cd ./soap
 ```
 ## Instalar dependências
 ```sh

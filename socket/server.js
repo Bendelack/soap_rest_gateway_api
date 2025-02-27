@@ -30,14 +30,14 @@ io.on('connection', (socket) => {
     console.log("Novo jogador conectado!");
     numPlayers++;
     console.log("Jogadores online: ", numPlayers);
-    
+
     // quando tiver um único jogador, uma palavra é sorteada e enviada via socket
     if(numPlayers === 1){
         palavraSortada = sortear();
         io.emit("palavra", palavraSortada);
     } else // caso contrário, quando um jogar se conectar a palavra atual sorteada é enviada para ele
-    socket.emit("palavra", palavraSortada);
-    
+        socket.emit("palavra", palavraSortada);
+
     // quando um jogador acerta a palavra uma nova é enviada
     socket.on('acerto', (palavra) => {
         console.log("Palavra acertada: ", palavra);

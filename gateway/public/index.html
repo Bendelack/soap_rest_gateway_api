@@ -13,8 +13,9 @@
         <a href="/ranking" class="text-[#3aa394] hover:text-white hover:bg-purple-700 font-semibold cursor-pointer font-[19px] mt-5">Ranking</a>
         <a href="/logout" class="text-[#e61e48] font-semibold hover:underline cursor-pointer font-[19px] mt-5">Sair</a>
     </div>
-    <p class="p-5 text-[35px]">Olá, seja bem-vindo(a) ao game baseado no wordle/termo!</p>
-    <div class="flex items-center justify-center w-[500px] mx-auto bg-[#6E5C62] py-2">
+    <p class="mt-5 text-[34px] text-[#312A2C]">Welcome to the game!</p>
+    <small class="text-[17px] text-[#6E5C62]">Baseado no <a class="text-[#538D4E] hover:underline cursor-pointer" href="https://term.ooo" target="_blank">Termo</a> e no <a href="https://www.nytimes.com/games/wordle/index.html" target="_blank" class="text-[#538D4E] hover:underline cursor-pointer">Wordle</a>!</small>
+    <div class="mt-5 flex items-center justify-center w-[500px] mx-auto bg-[#6E5C62] py-2">
         <div id="a" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#3AA394] mx-1 text-[35px] text-white font-black text-center">H</div>
         <div id="b" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#312A2C] mx-1 text-[35px] text-white font-black text-center">E</div>
         <div id="c" class="flex items-center justify-center rounded-md size-16 p-2 bg-[#D3AD69] mx-1 text-[35px] text-white font-black text-center">L</div>
@@ -25,47 +26,16 @@
         <input required type="text" placeholder="Sua tentantiva aqui..." id="palavra" name="palavra" class="p-2 text-[22px] focus:outline-none">
         <button class="rounded-md text-white p-2 cursor-pointer bg-purple-900 text-[22px] hover:opacity-80">Enviar</button>
     </form>
-    <!-- <div class=" max-h-[300px] overflow-y-auto border border-gray-300 rounded-md p-4">
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-        <p>PABLO VEGETTI ACERTOU A PALAVRA SONHO</p>
-    </div> -->
-    <div id="eventos" class="max-h-[300px] overflow-y-auto border-purple-300 border p-4">
-        <p class="text-center text-[#D3AD69] text-[22px] border-b-2 border-[#D3AD69] inline-block mb-[px] py-1 px-2">Eventos do jogo</p>
+    <div class="max-h-[300px] overflow-y-auto border-purple-300 border p-4">
+        <p class="text-center text-[#312A2C] text-[22px] border-b-2 border-[#312A2C] inline-block mb-[px] py-1 px-2">Eventos do jogo</p>
+        <div id="eventos"></div>
     </div>
 </body>
 <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 <script>
     const socket = io("ws://192.168.0.16:3001");
-    const palavras = [
-        "AREIA", "ARENA", "AUDIO", "AUREO", "BAILE", "BARCO", "BARRA", "BOLSA", "BORDA", // [A-B]
-        "CLONE", "DRAMA", "FRETE", "GRAMA", "GRATO", "HOMEM", "IDEAL", "ITENS", "JEGUE", // [C-J]
-        "MANGA", "MANTO", "MEIAS", "MOLHO", "NATAL", "NOITE", "PADRE", "PEDRA", "PODER", // [M-P]
-        "PONTE", "POSTE", "SOBRE", "SAMBA", "TEMPO", "TERMO", "TRENA", "VASCO", "ZEBRA"  // [P-Z]
-    ];
-    let max;
-    let indexSorteado;
+    // const socket = io("ws://10.0.0.106:3001");
+
     let palavraSortada;
     const a = document.getElementById("a"); // bloco de letra
     const b = document.getElementById("b"); // bloco de letra
@@ -73,20 +43,22 @@
     const d = document.getElementById("d"); // bloco de letra
     const e = document.getElementById("e"); // bloco de letra
 
-    function sortear(){
-        max = palavras.length;
-        indexSorteado = Math.floor(Math.random()*max);
-        palavraSortada = palavras[indexSorteado];
-    }
-
     socket.on("evento", (mensagem) => {
         const eventosDiv = document.getElementById("eventos");
+        console.log("num_children: ", eventosDiv.childElementCount);
+        
+        if(eventosDiv.childElementCount === 5)
+            eventosDiv.removeChild(eventosDiv.firstChild);
+        // const ev = document.getElementById("mensagem");
         const evento = document.createElement("p");
         if(mensagem.includes("acertou"))
-            evento.className = "text-[#3AA394] my-2"
+            // ev.className = "text-[#3AA394] my-2"
+            evento.className = "text-[#3AA394] my-2";
         else
-            evento.className = "text-[#E61E48] my-2"
+            // ev.className = "text-[#E61E48] my-2"
+            evento.className = "text-[#E61E48] my-2";
 
+        // ev.innerText = mensagem;
         evento.innerText = mensagem;
         eventosDiv.appendChild(evento);
     })
@@ -119,14 +91,13 @@
             cores = ["#3AA394", "#3AA394", "#3AA394", "#3AA394", "#3AA394"]; // cor de letra certa em todos os blocos
             socket.emit("acerto", palavra);
             registrarTentativa(palavra, true); // função para registrar o acerto
-            // sortear(); // chama função para sortear nova palavra
         } else {
             registrarTentativa(palavra, false); // função para registrar o acerto
             for (let i = 0; i < 5; i++) {
                 if(palavra[i] == palavraSortada[i]) // acertou a letra e a posição
                     cores[i] = "#3AA394"; // cor verde na possição da letra certa
                 else if(palavraSortada.includes(palavra[i])){ // acertou a letra mas errou a posição
-                    const letrasAnteriores = palavraSortada.slice(0, i); // pega as letras anteriores
+                    const letrasAnteriores = palavra.slice(0, i); // pega as letras anteriores
                     // contagem da letra até certo ponto
                     const correspondeciasLetrasAnteriores = contarLetra(letrasAnteriores, palavra[i]);
                     // conta da letra da palavra completa
@@ -156,7 +127,7 @@
         let contador = 0;
         for (let i = 0; i < palavra.length; i++) {
             if (palavra[i].toLowerCase() === letra.toLowerCase()) { // Ignora maiúsculas/minúsculas
-            contador++;
+                contador++;
             }
         }
         return contador;
@@ -164,7 +135,7 @@
 
     // função para registrar o acerto do usuário
     async function registrarTentativa(palavra, acertou){
-        console.log(palavra);
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         try {
             const resposta = await fetch("/tentativa", {
@@ -173,7 +144,7 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ palavra, acertou })
-            });
+            });            
 
             if (resposta.ok) {
                 console.log("Tentativa enviada!");
@@ -181,10 +152,9 @@
                 console.log("Erro ao enviar tentativa.");
             }
         } catch(err){
-        console.log("ocorreu um erro: ", err);
+            console.log("ocorreu um erro: ", err);
         }
     }
-    // sortear();
 
 </script>
 </html>

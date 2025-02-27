@@ -51,20 +51,23 @@ app.get("/ranking", authenticateToken, (req, res) => {
 app.post("/tentativa", authenticateToken, async (req, res) => {
     const { palavra, acertou } = req.body;    
     const username = req.user.username;
+    console.log(" > " + palavra + " ");
 
     try {
         // aumentando o score do usuário
-        const user = (await axios.get(`${API_REST+username}`)).data; // get use by username from rest api
-        const score = parseInt(user.score) + 1;
-        const userToPatch = {
-            score: score
-        }
-
-        await axios.patch(`${API_REST}${user.id}`, userToPatch, {
-            headers: {
-                "Content-Type": "application/json"
+        if(acertou){
+            const user = (await axios.get(`${API_REST+username}`)).data; // get use by username from rest api
+            const score = parseInt(user.score) + 1;
+            const userToPatch = {
+                score: score
             }
-        }); // get use by username from rest api
+
+            await axios.patch(`${API_REST}${user.id}`, userToPatch, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }); // get use by username from rest api
+        }
 
         const xmlData = `
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://src.soap/">
@@ -84,6 +87,8 @@ app.post("/tentativa", authenticateToken, async (req, res) => {
                 'Content-Type': 'text/xml',
             }
         })
+
+        res.json({ mensagem: "Tentativa registrada!" });
         
     } catch (err) {
         console.log(err);
