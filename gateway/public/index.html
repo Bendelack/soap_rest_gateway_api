@@ -33,7 +33,7 @@
 </body>
 <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 <script>
-    const socket = io("ws://192.168.0.16:3001");
+    const socket = io("ws://10.24.3.214:3001");
     // const socket = io("ws://10.0.0.106:3001");
 
     let palavraSortada;
@@ -45,8 +45,7 @@
 
     socket.on("evento", (mensagem) => {
         const eventosDiv = document.getElementById("eventos");
-        console.log("num_children: ", eventosDiv.childElementCount);
-        
+
         if(eventosDiv.childElementCount === 5)
             eventosDiv.removeChild(eventosDiv.firstChild);
         // const ev = document.getElementById("mensagem");
@@ -146,11 +145,8 @@
                 body: JSON.stringify({ palavra, acertou })
             });            
 
-            if (resposta.ok) {
-                console.log("Tentativa enviada!");
-            } else {
+            if (!resposta.ok)
                 console.log("Erro ao enviar tentativa.");
-            }
         } catch(err){
             console.log("ocorreu um erro: ", err);
         }

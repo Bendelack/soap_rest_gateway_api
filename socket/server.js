@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 
 // array das palavras do jogo
 const palavras = [
-    "AREIA", "ARENA", "AUDIO", "AUREO", "BAILE", "BARCO", "BARRA", "BOLSA", "BORDA", // [A-B]
+    "AREIA", "ARENA", "AUDIO", "AUTOR", "BAILE", "BARCO", "BARRA", "BOLSA", "BORDA", // [A-B]
     "CLONE", "DRAMA", "FRETE", "GRAMA", "GRATO", "HOMEM", "IDEAL", "ITENS", "JEGUE", // [C-J]
     "MANGA", "MANTO", "MEIAS", "MOLHO", "NATAL", "NOITE", "PADRE", "PEDRA", "PODER", // [M-P]
     "PONTE", "POSTE", "SOBRE", "SAMBA", "TEMPO", "TERMO", "TRENA", "VASCO", "ZEBRA"  // [P-Z]

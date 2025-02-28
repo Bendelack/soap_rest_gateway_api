@@ -7,8 +7,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
 
-
-@WebService(endpointInterface = "soap.src.SoapServer")
+@WebService(endpointInterface = "soap.src.SoapServer") // liga a classe à interface
 public class SoapServerImpl implements SoapServer {
     private static final String nome_fila = "eventos";
     private Connection conexao;
@@ -22,7 +21,7 @@ public class SoapServerImpl implements SoapServer {
         this.canal = conexao.createChannel();
 
         // Declara uma fila (caso não exista)
-        this.canal.queueDeclare(nome_fila, true, false, false, null);
+        this.canal.queueDeclare(nome_fila, false, false, false, null);
     }
     @Override
     public void mensagem(String username, String palavra, Boolean acertou) throws Exception {
