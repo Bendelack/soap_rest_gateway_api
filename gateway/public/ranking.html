@@ -25,7 +25,7 @@
     const rank = document.getElementById("rank");
     async function fetchUsers() {
         try {
-            const response = await fetch("http://192.168.0.16:8080/users/");
+            const response = await fetch("http://10.24.3.214:8080/users/");
             // const response = await fetch("http://10.0.0.106:8080/users/");
             const users = await response.json(); // Converte a resposta para JSON
             users.sort((a, b) => b.score - a.score);
